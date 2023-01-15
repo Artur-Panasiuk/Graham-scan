@@ -2,6 +2,8 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -14,6 +16,8 @@ int main()
 {
     points *collection;
     int collectionSize;
+
+    //open file
 
     fstream cordsFile;
     cordsFile.open("points1.txt", ios::in);
@@ -45,12 +49,41 @@ int main()
         delete[] allCords;
     }
 
-    cout.precision(9);
-    for(int i = 0; i < collectionSize; i++){
-        cout << "x: " << collection[i].x << " y: " << collection[i].y << endl;
+    points *collectionCopy = new points[collectionSize];
+
+    for(int i = 0 ; i < collectionSize; i++){
+        collectionCopy[i] = collection[i];
     }
 
+    /*
+    cout.precision(9);
+    for(int i = 0; i < collectionSize; i++){
+        cout << "x: " << collectionCopy[i].x << " y: " << collectionCopy[i].y << endl;
+    }
+    */
+
+
+    //get starting point
+
+    double temp = 1;
+    points* startingPoint;
+
+    for(int i = 0; i < collectionSize; i++){
+        if(collectionCopy[i].y < temp){
+            temp = collectionCopy[i].y;
+            startingPoint = &collectionCopy[i];
+        }else if(collectionCopy[i].y == temp){
+            if(collectionCopy[i].x < startingPoint->x){
+                temp = collectionCopy[i].y;
+                startingPoint = &collectionCopy[i];
+            }
+        }
+    }
+
+    //cout << "x: " << startingPoint->x << " y: " << startingPoint->y << endl;
+
     delete[] collection;
+    delete[] collectionCopy;
 
     return 0;
 }
