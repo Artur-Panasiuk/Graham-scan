@@ -4,20 +4,27 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
 using namespace std;
 
 struct points{
-    double x;
-    double y;
+    double x, y, angle;
 };
+
+bool compare(points a, points b){
+    if(a.angle < b.angle)
+        return 1;
+    else
+        return 0;
+}
 
 int main()
 {
     points *collection;
     int collectionSize;
 
-    //open file
+    //OPEN FILE
 
     fstream cordsFile;
     cordsFile.open("points1.txt", ios::in);
@@ -49,38 +56,58 @@ int main()
         delete[] allCords;
     }
 
-    points *collectionCopy = new points[collectionSize];
+    //FIND STARTING POINT
 
-    for(int i = 0 ; i < collectionSize; i++){
-        collectionCopy[i] = collection[i];
-    }
 
     /*
-    cout.precision(9);
-    for(int i = 0; i < collectionSize; i++){
-        cout << "x: " << collectionCopy[i].x << " y: " << collectionCopy[i].y << endl;
-    }
-    */
-
-
-    //get starting point
-
     double temp = 1;
     points* startingPoint;
 
     for(int i = 0; i < collectionSize; i++){
-        if(collectionCopy[i].y < temp){
-            temp = collectionCopy[i].y;
-            startingPoint = &collectionCopy[i];
-        }else if(collectionCopy[i].y == temp){
-            if(collectionCopy[i].x < startingPoint->x){
-                temp = collectionCopy[i].y;
-                startingPoint = &collectionCopy[i];
+        if(collection[i].y < temp){
+            temp = collection[i].y;
+            startingPoint = &collection[i];
+        }else if(collection[i].y == temp){
+            if(collection[i].x < startingPoint->x){
+                temp = collection[i].y;
+                startingPoint = &collection[i];
             }
         }
     }
+    */
 
-    //cout << "x: " << startingPoint->x << " y: " << startingPoint->y << endl;
+    //SORT
+
+    points sortingRef = {1, 0};
+    points *collectionCopy = new points[collectionSize];
+    vector<points> hull;
+
+
+    for(int i = 0; i < collectionSize; i++){
+        collectionCopy[i] = collection[i];
+        collectionCopy[i].angle = sortingRef.y * collection[i].x - collection[i].y - sortingRef.x;
+    }
+
+    sort(collectionCopy, collectionCopy+collectionSize, compare);
+
+    /*
+    for(int i = 0; i < collectionSize; i++){
+        cout << "x: " << collectionCopy[i].x << " y: " << collectionCopy[i].y << " angle: " << collectionCopy[i].angle << endl;
+    }
+    */
+
+    //ASSIGN TO HULL
+
+    hull.push_back(collectionCopy[collectionSize-1]);
+    hull.push_back(collectionCopy[0]);
+
+    for(int i = 1; i < collectionSize - 1; i++){
+        int hs = hull.size();
+        double head = hull[hs - 1].y * collectionCopy[i].y - collectionCopy[i].x * hull[hs - 1].x;
+        double tail = hull[hs - 2].y * hull[hs - 1].y - hull[hs - 1].x * hull[hs - 2].x;
+        //cout << result << endl;
+
+    }
 
     delete[] collection;
     delete[] collectionCopy;
