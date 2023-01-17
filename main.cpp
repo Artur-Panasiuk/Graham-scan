@@ -6,10 +6,12 @@
 #include <iterator>
 #include <vector>
 #include <math.h>
+#include <time.h>
 
 using namespace std;
 
 struct points{
+    int i;
     double x, y, angle;
 };
 
@@ -31,10 +33,14 @@ double orientation(points p1, points p2, points p3){
 
 int main()
 {
+    clock_t mainStart, mainEnd, sortStart, sortEnd, assignStart, assignEnd;
+
+    mainStart = clock();
+
     points *collection;
     int collectionSize;
 
-    //OPEN FILE
+    //OPEN FILE-------------------------------------
 
     fstream cordsFile;
     cordsFile.open("points0.txt", ios::in);
@@ -66,7 +72,7 @@ int main()
         delete[] allCords;
     }
 
-    //FIND STARTING POINT
+    //FIND STARTING POINT-------------------------------------
 
     points *collectionCopy = new points[collectionSize];
 
@@ -74,6 +80,7 @@ int main()
     int startIndex;
     for(int i = 0; i < collectionSize; i++){
         collectionCopy[i] = collection[i];
+        collectionCopy[i].i = i; //DO WRZUCENIA NA SORTOWANIE
         if(collectionCopy[i].y < temp){
             temp = collectionCopy[i].y;
             startIndex = i;
@@ -87,7 +94,10 @@ int main()
 
     swap(collectionCopy[0], collectionCopy[startIndex]);
 
-    //SORT
+    //SORT-----------------------------------------------------------
+
+    sortStart = clock();
+
     vector<points> hull;
 
 //    for(int i = 1; i < collectionSize; i++){
@@ -103,7 +113,11 @@ int main()
     swap(collectionCopy[5], collectionCopy[6]);
     swap(collectionCopy[6], collectionCopy[7]);
 
-    //ASSIGN TO HULL
+    sortEnd = clock();
+
+    //ASSIGN TO HULL----------------------------------------------------
+
+    assignStart = clock();
 
     hull.push_back(collectionCopy[0]);
     hull.push_back(collectionCopy[1]);
@@ -115,12 +129,28 @@ int main()
         hull.push_back(collectionCopy[i]);
     }
 
-    for(int i = 0; i < hull.size(); i++){
-        cout << "x: " << hull[i].x << " y: " << hull[i].y << " angle: " << hull[i].angle << endl;
-    }
+    assignEnd = clock();
 
     delete[] collection;
     delete[] collectionCopy;
+
+    mainEnd = clock();
+
+    cout << "Liczba punktow bioraca udzial w powloce: " << hull.size() << endl;
+    cout << "Indeksy budujace powloke: " << endl;
+
+    for(points i : hull){
+        cout << "index: " << i.i << " x: " << i.x << " y: " << i.y << endl;
+    }
+    cout << endl;
+
+    double time1 = ((double)(mainEnd-mainStart)) / CLOCKS_PER_SEC;
+    double time2 = ((double)(sortEnd-sortStart)) / CLOCKS_PER_SEC;
+    double time3 = ((double)(assignEnd-assignStart)) / CLOCKS_PER_SEC;
+
+    cout << "Czas sortowania: " << time2 << "s" <<  endl;
+    cout << "Czas przypisania: " << time3 << "s" <<  endl;
+    cout << "Czas calego programu: " << time1 << "s" <<  endl;
 
     return 0;
 }
