@@ -12,7 +12,7 @@ using namespace std;
 
 struct points {
     int i;
-    double x, y, angle;
+    double x, y;
 };
 
 int ori(const void *pp1, const void *pp2) {
@@ -91,7 +91,7 @@ int main()
     double temp = collection[startIndex].y;
     for (int i = 0; i < collectionSize; i++) {
         collectionCopy[i] = collection[i];
-        collectionCopy[i].i = i; //DO WRZUCENIA NA SORTOWANIE
+        collectionCopy[i].i = i;
         if (collectionCopy[i].y < temp) {
             temp = collectionCopy[i].y;
             startIndex = i;
